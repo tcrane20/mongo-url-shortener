@@ -1,0 +1,48 @@
+
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <title>Mongo Shortener</title>
+    <link rel='stylesheet' href='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css' type='text/css'>
+  </head>
+
+  <body>
+    <div class='container'>
+      <h1>URL Shortener</h1>
+    </div>
+
+    <div class='panel panel-default'>
+      <div class='panel-body'>
+
+        <center>
+          <form>
+            <input type="text" class='shortText'><input type="submit" class='shortSubmit' value="Shorten!">
+          </form>
+          <div class="result"></div>
+        </center>
+
+      </div>
+    </div>
+
+    <div class='container'>
+      <div class='panel panel-default'>
+        <div class='panel-heading'>
+          <h2 class='panel-title'>Top 10 Links</h2>
+        </div>
+
+        <table class="table">
+          <tr>
+            <td><b>URL</b></td>
+            <td><b>Page Hits</b></td>
+          </tr>
+        </table>
+
+      </div>
+    </div>
+
+    <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="javascript/app.js"></script>
+
+  </body>
+
+</html>
