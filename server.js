@@ -1,10 +1,10 @@
 // Reference: http://blog.modulus.io/getting-started-with-mongoose
 
-var http = require('http'),
-    express = require('express'),
-    bodyParser = require('body-parser'),
+var http = require("http"),
+    express = require("express"),
+    bodyParser = require("body-parser"),
     app = express(),
-    mongoose = require('mongoose'),
+    mongoose = require("mongoose"),
     nextKey = 0;
 
 // Loads index.html inside /client folder
@@ -21,19 +21,20 @@ var websiteSchema = new mongoose.Schema(
 	shortUrl: String,
 	views: Number
 	},
-	{collection: 'website'}
+	{collection: "website"}
 );
-var Website = mongoose.model('Website', websiteSchema);
+var Website = mongoose.model("Website", websiteSchema);
 
 var keySchema = new mongoose.Schema(
 	{keyid: Number}, 
-	{collection: 'nextkey'}
+	{collection: "nextkey"}
 );
-var NextKey = mongoose.model('NextKey', keySchema);
+var NextKey = mongoose.model("NextKey", keySchema);
 //-------------------------------------------------------------
 
 // Upon connection to MongoDB, generate a key unless one already exists in the database
-mongoose.connect("mongodb://localhost/test", function(err, res){
+mongoose.connect("mongodb://localhost/test", function (err){
+	"use strict";
 	if (err){
 		console.error("FAILED CONNECTING TO MONGODB! ERROR: " + err);
 	} else {
@@ -66,22 +67,25 @@ mongoose.connect("mongodb://localhost/test", function(err, res){
 
 // Helper function that returns the next key and creates a new one
 function getNextKey(){
+	"use strict";
 	// Make copy of nextKey to return
 	var aliasKey = nextKey;
 	// Generate next key and increase values in database
 	var incrNext = Math.floor(Math.random() * 100) + 1;
 	nextKey += incrNext;
 	// Set the next key value in database
-	NextKey.findOneAndUpdate({}, {$set: {keyid: nextKey} }, function(err, res){
-			if (err) console.log("ERROR");
+	NextKey.findOneAndUpdate({}, {$set: {keyid: nextKey} }, function (err){
+		if (err){
+			console.log("ERROR");
 		}
-	);
+	});
 	return aliasKey.toString(36);
 }
 
 
 // When user wishes to navigate to a page on the website, most likely a shortened URL
 app.get("/:url", function(req, res){
+	"use strict";
 	var url = req.params.url;
 	Website.findOneAndUpdate({shortUrl: url}, {$inc: {views: 1}}, function (err, doc){
 		if (err){
@@ -97,19 +101,20 @@ app.get("/:url", function(req, res){
 
 // Upon arriving to home page, user is requesting the popular links
 app.post("/hits", function(req, res){
+	"use strict";
 	// Finds all the websites and sorts them based on page hits (views)
 	Website.find({}, null, {sort: {views: -1}}, function (err, list){
 		var i = 0;
-		var results = []
+		var results = [];
 		var url;
 		// Ensure only a TOP 10 list
 		var urls = list.slice(0,10);
-		
+
 		for (i; i < list.length; i++){
 			url = urls[i];
 			// We don't want to show URLs that have 0 hits
 			if (url.views > 0){
-				results.push(url.shortUrl, url.views)
+				results.push(url.shortUrl, url.views);
 			} else {
 				break;
 			}
@@ -121,6 +126,7 @@ app.post("/hits", function(req, res){
 
 // User submits a URL to be shortened or obtain the original URL
 app.post("/shorter", function (req, res){
+	"use strict";
 	// Get URL inside textbox
 	var url = req.body.url;
 	// Gets the address URL of the requester
@@ -129,7 +135,7 @@ app.post("/shorter", function (req, res){
 	var base_url_regex = new RegExp(base_url + "\/(.+)");
 	// See if the input DOES match the above template (null otherwise)
 	var key = url.match(base_url_regex);
-	
+
 	// Use regular expression to test if inputted URL is requesting for unshortened URL
 	if (key !== null){
 		// Get the shorthand key in the URL (should be at index 1 of match() result)
@@ -139,9 +145,9 @@ app.post("/shorter", function (req, res){
 			if (err){
 				console.error(err);
 			} else if (!docs.length){
-				res.json({'type': '2', 'url': ""});
+				res.json({"type": "2","url": ""});
 			} else { // Exists
-				res.json({'type': '1', 'url': docs[0].origUrl});
+				res.json({"type": "1","url": docs[0].origUrl});
 			}
 		});
 	} else { // Did not match; must be shortening a URL
@@ -162,9 +168,9 @@ app.post("/shorter", function (req, res){
 						console.error(err);
 					}
 				});
-				res.json({'type': '0', 'url': base_url + "/" + key});
+				res.json({"type": "0","url": base_url + "/" + key});
 			} else { // Exists, return database value
-				res.json({'type': '0', 'url': base_url + "/" + docs[0].shortUrl});
+				res.json({"type": "0","url": base_url + "/" + docs[0].shortUrl});
 			}
 		});
 	}
